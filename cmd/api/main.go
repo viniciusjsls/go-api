@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"os"
+)
 
 func main() {
-	fmt.Println("Hello from Go API!")
+	// Get the port from environment variable or use default
+	// can be provided when calling `go run`
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 }
