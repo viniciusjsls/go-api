@@ -1,7 +1,10 @@
 package main
 
 import (
+	"net/http"
 	"os"
+
+	"github.com/viniciusjsls/go-api/internal/handlers"
 )
 
 func main() {
@@ -10,5 +13,18 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
+	}
+
+	// router, redirect to respective handdler
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", handlers.HealthHandler)
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		panic(err)
 	}
 }
