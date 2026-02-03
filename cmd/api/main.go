@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -18,13 +19,16 @@ func main() {
 	// router, redirect to respective handdler
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.HealthHandler)
+	mux.HandleFunc("/users", handlers.UsersHandler)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		panic(err)
+	log.Printf("listening on :%s", port)
+
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("server error: %v", err)
 	}
 }

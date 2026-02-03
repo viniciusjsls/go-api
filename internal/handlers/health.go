@@ -10,8 +10,7 @@ type healthResponse struct {
 }
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+	if !IsValidHttpRequestMethod(&w, r, http.MethodGet) {
 		return
 	}
 
