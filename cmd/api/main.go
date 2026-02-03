@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/viniciusjsls/go-api/internal/handlers"
+	"github.com/viniciusjsls/go-api/internal/middleware"
 )
 
 func main() {
@@ -17,18 +17,12 @@ func main() {
 	}
 
 	// router, redirect to respective handdler
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", handlers.HealthHandler)
-	mux.HandleFunc("/users", handlers.UsersHandler)
+	router := gin.Default()
+	router.GET("/health", handlers.HealthHandler)
+	router.GET("/users", handlers.UsersHandler)
+	router.POST("/users", handlers.CreateUser)
 
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
-	}
+	router.Run(":" + port)
 
-	log.Printf("listening on :%s", port)
-
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("server error: %v", err)
-	}
+	router.Use(middleware.Logging)
 }
