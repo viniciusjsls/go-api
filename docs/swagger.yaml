@@ -1,0 +1,61 @@
+basePath: /
+definitions:
+  handlers.User:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Learning Go API with Gin
+  title: Go API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Provide API health status
+      responses:
+        "200":
+          description: OK
+      summary: Health Check
+  /users:
+    get:
+      description: Get a list of all users
+      operationId: get-users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.User'
+            type: array
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with name
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.User'
+      summary: Create a new user
+      tags:
+      - users
+swagger: "2.0"
