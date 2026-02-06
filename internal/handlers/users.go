@@ -1,16 +1,11 @@
 package handlers
 
 import (
-	"math/rand"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/viniciusjsls/go-api/internal/dto"
 )
-
-type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
 
 // @Summary Get all users
 // @Description Get a list of all users
@@ -20,7 +15,7 @@ type User struct {
 // @Success 200 {array} User
 // @Router /users [get]
 func UsersHandler(c *gin.Context) {
-	users := []User{
+	users := []dto.UserResponse{
 		{ID: 1, Name: "John Doe"},
 		{ID: 2, Name: "Jane Smith"},
 	}
@@ -37,10 +32,14 @@ func UsersHandler(c *gin.Context) {
 // @Success 201 {object} User
 // @Router /users [post]
 func CreateUser(c *gin.Context) {
-	var newUser User
-	c.BindJSON(&newUser)
+	var newUser dto.UserCreateRequest
 
-	newUser.ID = rand.Intn(100)
+	if err := c.BindJSON(&newUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	c.JSON(http.StatusCreated, newUser)
+	user := dto.NewUserFromRequest(newUser)
+
+	c.JSON(http.StatusCreated, dto.ToUserResponse(user))
 }
