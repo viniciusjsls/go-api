@@ -1,21 +1,14 @@
 package config
 
 import (
-	"os"
-
 	"go.uber.org/zap"
 )
 
-func InitLogger() *zap.Logger {
-	env := os.Getenv("APP_ENV")
-	if env == "" {
-		env = "development"
-	}
-
+func InitLogger(cfg *Config) *zap.Logger {
 	var logger *zap.Logger
 	var err error
 
-	if env == "production" {
+	if cfg.AppEnv == "production" {
 		logger, err = zap.NewProduction()
 	} else {
 		logger, err = zap.NewDevelopment()
@@ -24,6 +17,8 @@ func InitLogger() *zap.Logger {
 	if err != nil {
 		panic(err)
 	}
+
+	defer logger.Sync()
 
 	return logger
 }

@@ -1,15 +1,11 @@
 package main
 
 import (
-	"os"
+	"log"
 
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/viniciusjsls/go-api/docs"
+	"github.com/viniciusjsls/go-api/internal/app"
 	"github.com/viniciusjsls/go-api/internal/config"
-	"github.com/viniciusjsls/go-api/internal/handlers"
-	"github.com/viniciusjsls/go-api/internal/middleware"
 )
 
 // @title           Go API
@@ -18,29 +14,17 @@ import (
 // @host            localhost:8080
 // @BasePath        /
 func main() {
-	// init Logger
-	logger := config.InitLogger()
-	defer logger.Sync()
+	cfg, err := config.Load()
 
-	// Get the port from environment variable or use default
-	// can be provided when calling `go run`
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// router, redirect to respective handdler
-	router := gin.Default()
+	logger := config.InitLogger(cfg)
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	server := app.NewServer(cfg, logger)
 
-	router.GET("/health", handlers.HealthHandler)
-	router.GET("/users", handlers.UsersHandler)
-	router.POST("/users", handlers.CreateUser)
-
-	router.Use(func(c *gin.Context) {
-		middleware.Logging(c, logger)
-	})
-
-	router.Run(":" + port)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }
