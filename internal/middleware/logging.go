@@ -1,13 +1,19 @@
 package middleware
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func Logging(c *gin.Context) {
-	log.Printf("Request: %s %s", c.Request.Method, c.Request.URL.Path)
+func Logging(c *gin.Context, logger *zap.Logger) {
+	logger.Info("request received",
+		zap.String("method", c.Request.Method),
+		zap.String("path", c.Request.URL.Path),
+	)
+
 	c.Next()
-	log.Printf("Response: %d", c.Writer.Status())
+
+	logger.Info("response sent",
+		zap.Int("status", c.Writer.Status()),
+	)
 }
